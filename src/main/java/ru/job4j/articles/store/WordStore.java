@@ -55,13 +55,15 @@ public class WordStore implements Store<Word>, AutoCloseable {
     }
 
     private void initWords() {
-        LOGGER.info("Заполнение таблицы слов");
-        try (var statement = connection.createStatement()) {
-            var sql = Files.readString(Path.of("db/scripts", "words.sql"));
-            statement.executeLargeUpdate(sql);
-        } catch (Exception e) {
-            LOGGER.error("Не удалось выполнить операцию: { }", e.getCause());
-            throw new IllegalStateException();
+        if (findAll().isEmpty()) {
+            LOGGER.info("Заполнение таблицы слов");
+            try (var statement = connection.createStatement()) {
+                var sql = Files.readString(Path.of("db/scripts", "words.sql"));
+                statement.executeLargeUpdate(sql);
+            } catch (Exception e) {
+                LOGGER.error("Не удалось выполнить операцию: { }", e.getCause());
+                throw new IllegalStateException();
+            }
         }
     }
 
